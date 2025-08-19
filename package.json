@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.1",
     "hono": "^4.9.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "wrangler": "^4.4.0"
   }
 }
