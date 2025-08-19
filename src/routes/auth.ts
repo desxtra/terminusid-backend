@@ -26,6 +26,7 @@ auth.post("/register", async (c) => {
       await supabase.auth.admin.createUser({
         email,
         password,
+        email_confirm: true,
       });
 
     if (authError) {
