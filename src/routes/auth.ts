@@ -84,4 +84,18 @@ auth.post("/login", async (c) => {
   }
 });
 
+//LOG OUT
+auth.post("/logout", async (c) => {
+  try {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      return c.json({ error: error.message }, 400);
+    }
+
+    return c.json({ message: "Logged out successfully" });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
 export default auth;
