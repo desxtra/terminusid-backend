@@ -27,3 +27,5 @@ profiles.get("/me", async (c) => {
   if (error) return c.json({ error: error.message }, 400);
   return c.json(profile);
 });
+
+export default profiles;
