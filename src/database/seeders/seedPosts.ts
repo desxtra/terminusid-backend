@@ -20,16 +20,63 @@ export async function seedPosts(
       status: "published",
     },
     {
+      user_id: userIds["arkana"],
+      title: "Understanding JavaScript Closures",
+      content:
+        "Closures are functions that have access to variables from another function’s scope.",
+      status: "published",
+    },
+    {
+      user_id: userIds["arkana"],
+      title: "My Thoughts on TypeScript",
+      content:
+        "TypeScript adds strong typing to JavaScript, making it safer for large projects.",
+      status: "draft",
+    },
+    {
+      user_id: userIds["arkana"],
+      title: "Learning React the Fun Way",
+      content: "React makes building interactive UIs easy and enjoyable.",
+      status: "published",
+    },
+    {
       user_id: userIds["lyra"],
       title: "Getting Started with Supabase",
       content: "Supabase is an open source Firebase alternative.",
       status: "published",
     },
     {
+      user_id: userIds["lyra"],
+      title: "Intro to Database Relationships",
+      content:
+        "One-to-many and many-to-many are the most common database relationships.",
+      status: "published",
+    },
+    {
+      user_id: userIds["lyra"],
+      title: "Deploying with Vercel",
+      content:
+        "Vercel is great for hosting fullstack projects with serverless functions.",
+      status: "draft",
+    },
+    {
       user_id: userIds["zephyr"],
       title: "My Travel Journey",
       content: "Sharing my adventure across Bali and beyond.",
       status: "draft",
+    },
+    {
+      user_id: userIds["zephyr"],
+      title: "Photography Tips for Beginners",
+      content:
+        "Lighting and composition are the two most important aspects of photography.",
+      status: "published",
+    },
+    {
+      user_id: userIds["zephyr"],
+      title: "Remote Work Lifestyle",
+      content: "Working remotely gives me freedom, but requires discipline.",
+      status: "published",
     },
   ];
 
