@@ -1,3 +1,5 @@
+// file: seeder.ts
+
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../types/database.types";
 import { config } from "dotenv";
@@ -8,44 +10,95 @@ import { seedTags } from "./seedTags";
 import { seedPosts } from "./seedPosts";
 import { seedComments } from "./seedComments";
 import { seedRelationships } from "./seedRelationships";
+import {
+  getExistingUserIds,
+  getExistingPostIds,
+  getExistingCategoryIds,
+  getExistingTagIds,
+} from "./utils";
 
 config();
 
-// Initialize Supabase client
 const supabase = createClient<Database>(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-/**
- * Main function to orchestrate the entire seeding process.
- */
+const args = process.argv.slice(2);
+const target = args[0] || "all";
+
 async function main() {
-  console.log("INFO: Starting database seeding process...");
+  console.log(`INFO: Starting database seeding for: ${target}`);
 
-  // Execute seeding functions in a specific order to manage dependencies
-  const userIds = await seedUsersAndProfiles(supabase);
-  if (Object.keys(userIds).length === 0) {
-    console.error("FATAL: User seeding failed. Aborting process.");
-    return;
+  switch (target) {
+    case "users":
+      await seedUsersAndProfiles(supabase);
+      break;
+
+    case "categories":
+      await seedCategories(supabase);
+      break;
+
+    case "tags":
+      await seedTags(supabase);
+      break;
+
+    case "posts": {
+      const userIds = await getExistingUserIds(supabase);
+      if (Object.keys(userIds).length === 0) {
+        console.warn(
+          "WARNING: No existing users found. Seeding new users first."
+        );
+        const newUsers = await seedUsersAndProfiles(supabase);
+        await seedPosts(supabase, newUsers);
+      } else {
+        await seedPosts(supabase, userIds);
+      }
+      break;
+    }
+
+    case "comments": {
+      const userIds = await getExistingUserIds(supabase);
+      const postIds = await getExistingPostIds(supabase);
+
+      if (
+        Object.keys(userIds).length === 0 ||
+        Object.keys(postIds).length === 0
+      ) {
+        console.error(
+          "ERROR: Cannot seed comments. Missing existing users or posts."
+        );
+        return;
+      }
+      await seedComments(supabase, userIds, postIds);
+      break;
+    }
+
+    case "relationships": {
+      const postIds = await getExistingPostIds(supabase);
+      if (Object.keys(postIds).length === 0) {
+        console.error(
+          "ERROR: Cannot seed relationships. No existing posts found."
+        );
+        return;
+      }
+      await seedRelationships(supabase, postIds);
+      break;
+    }
+
+    case "all":
+    default: {
+      const userIds = await seedUsersAndProfiles(supabase);
+      await seedCategories(supabase);
+      await seedTags(supabase);
+      const postIds = await seedPosts(supabase, userIds);
+      await seedComments(supabase, userIds, postIds);
+      await seedRelationships(supabase, postIds);
+      break;
+    }
   }
 
-  await seedCategories(supabase);
-  await seedTags(supabase);
-
-  const postIds = await seedPosts(supabase, userIds);
-  if (Object.keys(postIds).length === 0) {
-    console.error("FATAL: Post seeding failed. Aborting process.");
-    return;
-  }
-
-  await seedComments(supabase, userIds, postIds);
-  await seedRelationships(supabase, postIds);
-
-  console.log("SUCCESS: All seeding processes completed.");
+  console.log("SUCCESS: Seeding completed.");
 }
 
-// Run the main function
-main().catch((err) =>
-  console.error("FATAL: The main seeder script failed:", err)
-);
+main().catch((err) => console.error("FATAL: The seeder script failed:", err));
