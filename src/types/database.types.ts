@@ -18,14 +18,17 @@ export type Database = {
         Row: {
           id: number
           name: string
+          slug: string
         }
         Insert: {
           id?: never
           name: string
+          slug: string
         }
         Update: {
           id?: never
           name?: string
+          slug?: string
         }
         Relationships: []
       }
@@ -132,6 +135,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: number
+          slug: string
           status: string | null
           title: string
           updated_at: string | null
@@ -141,6 +145,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: never
+          slug: string
           status?: string | null
           title: string
           updated_at?: string | null
@@ -150,6 +155,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: never
+          slug?: string
           status?: string | null
           title?: string
           updated_at?: string | null
@@ -179,14 +185,17 @@ export type Database = {
         Row: {
           id: number
           name: string
+          slug: string
         }
         Insert: {
           id?: never
           name: string
+          slug: string
         }
         Update: {
           id?: never
           name?: string
+          slug?: string
         }
         Relationships: []
       }
