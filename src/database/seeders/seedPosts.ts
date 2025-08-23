@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../types/database.types";
+import { slugify } from "../../utils/slugify";
 
 /**
  * Seeds initial post data.
@@ -78,7 +79,10 @@ export async function seedPosts(
       content: "Working remotely gives me freedom, but requires discipline.",
       status: "published",
     },
-  ];
+  ].map((post) => ({
+    ...post,
+    slug: slugify(post.title),
+  }));
 
   try {
     const { data: posts, error } = await supabase
