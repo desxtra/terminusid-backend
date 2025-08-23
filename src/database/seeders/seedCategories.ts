@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../types/database.types";
+import { slugify } from "../../utils/slugify";
 
 /**
  * Seeds initial category data.
@@ -10,15 +11,15 @@ export async function seedCategories(
 ): Promise<void> {
   console.log("INFO: Seeding categories...");
   try {
-    const { error } = await supabase
-      .from("categories")
-      .insert([
-        { name: "Technology" },
-        { name: "Lifestyle" },
-        { name: "Travel" },
-        { name: "Food" },
-      ]);
+    const categoriesName = ["Technology", "Lifestyle", "Travel", "Food"];
+    const categories = categoriesName.map((name) => ({
+      name,
+      slug: slugify(name),
+    }));
+
+    const { error } = await supabase.from("categories").insert(categories);
     if (error) throw error;
+
     console.log("SUCCESS: Categories seeded successfully.");
   } catch (err: any) {
     console.error("ERROR: Failed to seed categories:", err.message);
