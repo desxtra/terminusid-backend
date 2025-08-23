@@ -98,7 +98,7 @@ async function main() {
     }
   }
 
-  console.log("SUCCESS: Seeding completed.");
+  console.log("END: Seeding completed.");
 }
 
 main().catch((err) => console.error("FATAL: The seeder script failed:", err));
