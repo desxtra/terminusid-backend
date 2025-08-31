@@ -22,46 +22,68 @@ posts.get("/", async (c) => {
   }
 });
 
-//Get a post by ID
-posts.get("/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("id", parseInt(id!))
-      .single();
-    if (error) throw c.json({ Error: error.message }, 500);
-    return c.json(data);
-  } catch (err: any) {
-    c.json({ Error: err.message }, 500);
-  }
-});
+//Get a post by slug
+// posts.get("/:slug", async (c) => {
+//   try {
+//     const id = c.req.param("slug");
+//     const { data, error } = await supabase
+//       .from("posts")
+//       .select("*")
+//       .eq("id", parseInt(id!))
+//       .single();
+//     if (error) throw c.json({ Error: error.message }, 500);
+//     return c.json(data);
+//   } catch (err: any) {
+//     c.json({ Error: err.message }, 500);
+//   }
+// });
 
-//Get posts by user ID
-posts.get("/by/:userid", async (c) => {
+//Get posts by username
+posts.get("/by/:username", async (c) => {
   try {
-    const userId = c.req.param("userid");
-    const { data, error } = await supabase
+    const username = c.req.param("username");
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("username", username!)
+      .single();
+    if (profileError) return c.json({ Error: profileError.message }, 500);
+
+    const id = "awasdawdoij-10281";
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.getUserById(profileData.id);
+    if (userError) return c.json({ Error: userError.message }, 500);
+
+    const { data: postData, error: postError } = await supabase
       .from("posts")
       .select("*")
-      .eq("user_id", userId!);
-    if (error) return c.json({ Error: error.message }, 500);
-    return c.json(data);
+      .eq("user_id", userData.user!.id);
+    if (postError) return c.json({ Error: postError.message }, 500);
+
+    return c.json([...postData]);
   } catch (err: any) {
     return c.json({ Error: err.message }, 500);
   }
 });
 
-//Get posts by category ID
-posts.get("/category/:categoryid", async (c) => {
+//Get posts by category
+posts.get("/category/:category", async (c) => {
   try {
-    const categoryId = c.req.param("categoryId");
+    const categorySlug = c.req.param("category");
     const { data, error } = await supabase
       .from("posts")
-      .select("*")
-      .eq("category_id", parseInt(categoryId!));
-    if (error) return c.json({ Error: error.message }, 500);
+      .select(
+        `
+        *,
+        post_categories!inner(
+          category_id,
+          categories!inner(
+            slug
+          )
+        )
+      `
+      )
+      .eq("post_categories.categories.slug", categorySlug);
     return c.json(data);
   } catch (err: any) {
     c.json({ Error: err.message }, 500);
